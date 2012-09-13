@@ -17,10 +17,11 @@ public class TLSUpdater {
 	private PendingIntent alarm;
 	private AlarmManager alarm_manager;
 	private long UPDATE_INTERVAL = 3000;
-	private int START_DELAY = 2;
-	private String DEBUG_TAG = "TLSUpdater";
 	private MyAlarmReceiver my_receiver;
 	private IntentFilter intentf;
+	
+	private int START_DELAY = 2;
+	private String DEBUG_TAG = "TLSUpdater";
 	
 	public TLSUpdater(Context ctx) {
 		context = ctx;
@@ -38,7 +39,6 @@ public class TLSUpdater {
 		// add 5 minutes to the calendar object
 		cal.add(Calendar.SECOND, START_DELAY);
  
-//    	Intent intent = new Intent(context, MyAlarmReceiver.class);
 		Intent intent = new Intent("com.yyl.myrmex.tlsupdater.TLSUpdater.uploadalarm");
     
     	alarm = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
