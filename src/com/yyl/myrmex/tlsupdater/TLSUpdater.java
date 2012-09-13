@@ -1,18 +1,24 @@
 package com.yyl.myrmex.tlsupdater;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
-
-import com.yyl.myrmex.api.tlsnode.R;
-import com.yyl.myrmex.api.tlsnode.Uploader.MyTLSClient;
+import org.apache.http.message.BasicNameValuePair;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -29,9 +35,10 @@ public class TLSUpdater {
 	private Context context;
 	private PendingIntent alarm;
 	private AlarmManager alarm_manager;
-	private long UPDATE_INTERVAL = 3000;
+	private long UPDATE_INTERVAL = 30000;
 	private MyAlarmReceiver my_receiver;
 	private IntentFilter intentf;
+	private boolean isReceiverRegistered = false;
 	
 	private int START_DELAY = 2;
 	private String DEBUG_TAG = "TLSUpdater";
@@ -46,7 +53,10 @@ public class TLSUpdater {
 	
 	public void run() {
 		Log.d(DEBUG_TAG, "TLSUpdater.run()");
-		context.registerReceiver(my_receiver, intentf);
+		if (isReceiverRegistered == false) {
+			context.registerReceiver(my_receiver, intentf);
+			isReceiverRegistered = true;			
+		}
 		// get a Calendar object with current time
 		Calendar cal = Calendar.getInstance();
 		// add 5 minutes to the calendar object
@@ -63,12 +73,14 @@ public class TLSUpdater {
 		Intent intent = new Intent(context, MyAlarmReceiver.class);
 		alarm = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		alarm_manager.cancel(alarm);
-		context.unregisterReceiver(my_receiver);
+		if (isReceiverRegistered == true)
+			context.unregisterReceiver(my_receiver);
 	}
 	
 	private class MyAlarmReceiver extends BroadcastReceiver {
 
 		private static final String DEBUG_TAG = "MyAlarmReceiver";
+		private Updater u;
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -76,27 +88,53 @@ public class TLSUpdater {
 			Log.d(DEBUG_TAG, "Recurring alarm; requesting location tracking.");
 			Toast.makeText(context, "hello alarm", Toast.LENGTH_SHORT).show();
 	        // start the service
-	        Intent updater = new Intent(context, Updater.class);
-	        context.startService(updater);
+	        u = new Updater(context);
+	        u.execute();
 		}
 		
 	}
 	
-	private class Updater extends AsyncTask {
+	private class Updater extends AsyncTask<Void, Void, Boolean> {
 
 		private MyTLSClient client;
+		private HttpPost httppost;
+		private HttpResponse getResponse;
 		private Context context;
 		
-		public Updater(Context ctx) {
+		public Updater (Context ctx) {
 			context = ctx;
 		}
 		
 		@Override
-		protected Object doInBackground(Object... params) {
+		protected Boolean doInBackground(Void... params) {
 			client = new MyTLSClient(context);
-			return null;
+			httppost = new HttpPost("https://107.22.124.12");
+			try {
+				// Add your data
+		        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+		        nameValuePairs.add(new BasicNameValuePair("id", "12345"));
+		        nameValuePairs.add(new BasicNameValuePair("stringdata", "AndDev is Cool!"));
+		        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+		        // Execute HTTP Post Request
+		        getResponse = client.execute(httppost);
+		        System.out.print(getResponse);
+				return true;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
 		}
 		
+		// can use UI thread here
+	    protected void onPostExecute(final Boolean success) {
+	       if (success) {
+	          Toast.makeText(context, "Connection successful", Toast.LENGTH_SHORT).show();
+	       } else {
+	          Toast.makeText(context, "Connection failed", Toast.LENGTH_SHORT).show();
+	       }
+	    }
+
 	}
 	
 	private class MyTLSClient extends DefaultHttpClient {
