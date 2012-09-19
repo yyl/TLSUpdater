@@ -21,6 +21,7 @@ public class MainActivity extends Activity {
         b1.setOnClickListener(mStartListener);
         b2 = (Button)findViewById(R.id.stop);
         b2.setOnClickListener(mStopListener);
+        tls = new TLSUpdater(getBaseContext(), "test.db");
     }
 
     @Override
@@ -31,7 +32,6 @@ public class MainActivity extends Activity {
     
     private OnClickListener mStartListener = new OnClickListener() {
         public void onClick(View v) {
-        	tls = new TLSUpdater(getBaseContext());
         	tls.run();
         }
     };

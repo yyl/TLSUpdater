@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<!--         <receiver android:name="com.yyl.myrmex.tlsupdater.TLSUpdater"></receiver> -->
+		<receiver android:name="com.yyl.myrmex.tlsupdater.AlarmReceiver"></receiver>
     </application>
 
 </manifest>
