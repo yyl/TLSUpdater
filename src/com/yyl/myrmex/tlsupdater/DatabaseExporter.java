@@ -58,7 +58,6 @@ public class DatabaseExporter {
                if(i != cols - 1)
             	   row += ", ";
             }
-            System.out.println(row);
             result.add(row);
          } while (c.moveToNext());
       }
