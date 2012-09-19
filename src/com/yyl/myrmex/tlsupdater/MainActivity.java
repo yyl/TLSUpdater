@@ -1,5 +1,7 @@
 package com.yyl.myrmex.tlsupdater;
 
+import com.yyl.myrmex.tlsupdater.database.TestDatabaseHelper;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -22,6 +24,9 @@ public class MainActivity extends Activity {
         b2 = (Button)findViewById(R.id.stop);
         b2.setOnClickListener(mStopListener);
         tls = new TLSUpdater(getBaseContext(), "test.db");
+        
+        TestDatabaseHelper database = new TestDatabaseHelper(getBaseContext());
+        database.getWritableDatabase();
     }
 
     @Override

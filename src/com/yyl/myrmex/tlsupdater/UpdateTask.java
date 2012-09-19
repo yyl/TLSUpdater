@@ -1,6 +1,7 @@
 package com.yyl.myrmex.tlsupdater;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,6 +16,7 @@ public class UpdateTask extends AsyncTask<Void, Void, Boolean> {
 		private SQLiteDatabase db;
 		private DatabaseExporter dbe;
 		private String db_name;
+		private ArrayList<String> result;
 		private String DEBUG_TAG = "AsyncTask: UpdateTask";
 		
 		public UpdateTask (Context ctx, String name) {
@@ -25,14 +27,14 @@ public class UpdateTask extends AsyncTask<Void, Void, Boolean> {
 		
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			Log.d(DEBUG_TAG, "doing it in the background!");
+			Log.d(DEBUG_TAG, "now doing it in the background!");
 			db = SQLiteDatabase.openDatabase(context.getDatabasePath(db_name).getAbsolutePath(),
 												null, SQLiteDatabase.OPEN_READWRITE);
-			Log.d(DEBUG_TAG, "db version: " + db.getVersion());
 			dbe = new DatabaseExporter(db);
 			
 			try {
-				dbe.export(db_name);
+				result = dbe.export(db_name);
+				System.out.println(result);
 				return true;
 			} catch (IOException e) {
 				e.printStackTrace();
