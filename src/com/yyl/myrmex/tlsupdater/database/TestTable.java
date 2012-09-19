@@ -19,22 +19,13 @@ public class TestTable {
 			+ COLUMN_TIME + " text not null, "
 			+ COLUMN_VALUES + " text not null"
 			+ ");";
-
-	private static final String TABLE_ADD_SAMPLE = "INSERT INTO " +
-			TABLE_NAME
-			+ " ("
-			+ COLUMN_TIME
-			+ ", "
-			+ COLUMN_VALUES
-			+ ") VALUES ("
-			+ "'2011', 'thevalue'"
-			+ ");";
 	
 	public static void onCreate(SQLiteDatabase database) {
 		database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
 		database.execSQL(TABLE_CREATE);
 		System.out.println("database created");
-		database.execSQL(TABLE_ADD_SAMPLE);
+		database.execSQL(addOneEntry("2010", "value1"));
+		database.execSQL(addOneEntry("2011", "value2"));
 		System.out.println("new entry added");
 	}
 
@@ -45,5 +36,18 @@ public class TestTable {
 				+ ", which will destroy all old data");
 		database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
 		onCreate(database);
+	}
+	
+	private static String addOneEntry(String time, String value) {
+		String ADD = "INSERT INTO " +
+				TABLE_NAME
+				+ " ("
+				+ COLUMN_TIME
+				+ ", "
+				+ COLUMN_VALUES
+				+ ") VALUES ("
+				+ "'" + time + "', '" + value + "'"
+				+ ");";
+		return ADD;
 	}
 }
