@@ -28,6 +28,7 @@ public class UpdateTask extends AsyncTask<Void, Void, Boolean> {
 			Log.d(DEBUG_TAG, "doing it in the background!");
 			db = SQLiteDatabase.openDatabase(context.getDatabasePath(db_name).getAbsolutePath(),
 												null, SQLiteDatabase.OPEN_READWRITE);
+			Log.d(DEBUG_TAG, "db version: " + db.getVersion());
 			dbe = new DatabaseExporter(db);
 			
 			try {
