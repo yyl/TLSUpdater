@@ -33,8 +33,8 @@ public class TLSUpdater {
 		// get a Calendar object with current time
 		Calendar updateTime = Calendar.getInstance();
 		updateTime.setTimeZone(TimeZone.getDefault());
-		updateTime.set(Calendar.HOUR_OF_DAY, 13);
-		updateTime.set(Calendar.MINUTE, 14);
+		updateTime.set(Calendar.HOUR_OF_DAY, this.hour);
+		updateTime.set(Calendar.MINUTE, this.minute);
 //		updateTime.add(Calendar.SECOND, START_DELAY);
 		Log.i(DEBUG_TAG, "Set the alarm to the time: " + updateTime.getTime());
 

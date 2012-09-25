@@ -26,6 +26,7 @@ public class UpdateTask extends AsyncTask<Void, Void, Boolean> {
 	private String ns;
 	private NotificationManager mNotificationManager;
 	private NotificationCompat.Builder builder;
+	
 
 	private String db_name;
 	private ArrayList<String> result;
