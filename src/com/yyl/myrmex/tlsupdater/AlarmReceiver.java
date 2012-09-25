@@ -7,16 +7,16 @@ import android.util.Log;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
-    private static final String DEBUG_TAG = "AlarmReceiver";
-    private UpdateTask task;
-    private String dbname;
+	private static final String DEBUG_TAG = "AlarmReceiver";
+	private UpdateTask task;
+	private String dbname;
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Log.d(DEBUG_TAG, "Recurring alarm; requesting update task!");
-        dbname = (String) intent.getCharSequenceExtra("dbname");
-        Log.d(DEBUG_TAG, "get the db name: " + dbname);
-        task = new UpdateTask(context, dbname);
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		Log.i(DEBUG_TAG, "Recurring alarm; requesting update task!");
+		dbname = (String) intent.getCharSequenceExtra("dbname");
+		Log.i(DEBUG_TAG, "get the db name: " + dbname);
+		task = new UpdateTask(context, dbname);
 		task.execute();
-    }
+	}
 }

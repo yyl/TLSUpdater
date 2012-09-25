@@ -26,6 +26,7 @@ public class MyTLSClient extends DefaultHttpClient {
 	        // Register for port 443 our SSLSocketFactory with our keystore
 	        // to the ConnectionManager
 	        registry.register(new Scheme("https", newSslSocketFactory(), 443));
+	        registry.register(new Scheme("http", newSslSocketFactory(), 2727));
 	        SingleClientConnManager cm = new SingleClientConnManager (
 	        		getParams(), registry);
 	        return cm;

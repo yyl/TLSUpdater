@@ -115,15 +115,11 @@ public class TestContentProvider extends ContentProvider {
 		case TODO_ID:
 			String id = uri.getLastPathSegment();
 			if (TextUtils.isEmpty(selection)) {
-				rowsDeleted = sqlDB.delete(
-						TestTable.TABLE_NAME,
-						TestTable.COLUMN_ID + "=" + id, 
-						null);
+				rowsDeleted = sqlDB.delete(TestTable.TABLE_NAME,
+						TestTable.COLUMN_ID + "=" + id, null);
 			} else {
-				rowsDeleted = sqlDB.delete(
-						TestTable.TABLE_NAME,
-						TestTable.COLUMN_ID + "=" + id 
-						+ " and " + selection,
+				rowsDeleted = sqlDB.delete(TestTable.TABLE_NAME,
+						TestTable.COLUMN_ID + "=" + id + " and " + selection,
 						selectionArgs);
 			}
 			break;
@@ -143,24 +139,17 @@ public class TestContentProvider extends ContentProvider {
 		int rowsUpdated = 0;
 		switch (uriType) {
 		case TODOS:
-			rowsUpdated = sqlDB.update(TestTable.TABLE_NAME, 
-					values, 
-					selection,
+			rowsUpdated = sqlDB.update(TestTable.TABLE_NAME, values, selection,
 					selectionArgs);
 			break;
 		case TODO_ID:
 			String id = uri.getLastPathSegment();
 			if (TextUtils.isEmpty(selection)) {
-				rowsUpdated = sqlDB.update(TestTable.TABLE_NAME, 
-						values,
-						TestTable.COLUMN_ID + "=" + id, 
-						null);
+				rowsUpdated = sqlDB.update(TestTable.TABLE_NAME, values,
+						TestTable.COLUMN_ID + "=" + id, null);
 			} else {
-				rowsUpdated = sqlDB.update(TestTable.TABLE_NAME, 
-						values,
-						TestTable.COLUMN_ID + "=" + id 
-						+ " and " 
-						+ selection,
+				rowsUpdated = sqlDB.update(TestTable.TABLE_NAME, values,
+						TestTable.COLUMN_ID + "=" + id + " and " + selection,
 						selectionArgs);
 			}
 			break;
@@ -172,9 +161,8 @@ public class TestContentProvider extends ContentProvider {
 	}
 
 	private void checkColumns(String[] projection) {
-		String[] available = { TestTable.COLUMN_TIME,
-				TestTable.COLUMN_VALUES, TestTable.COLUMN_TIME,
-				TestTable.COLUMN_ID};
+		String[] available = { TestTable.COLUMN_TIME, TestTable.COLUMN_VALUES,
+				TestTable.COLUMN_TIME, TestTable.COLUMN_ID };
 		if (projection != null) {
 			HashSet<String> requestedColumns = new HashSet<String>(
 					Arrays.asList(projection));
