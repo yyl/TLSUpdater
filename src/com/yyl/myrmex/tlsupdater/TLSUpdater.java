@@ -17,6 +17,8 @@ public class TLSUpdater {
 
 	private String dbname;
 	private int hour, minute;
+	private long UPDATE_INTERVAL = 30000;
+	private int START_DELAY = 2;
 	private String DEBUG_TAG = "TLSUpdater";
 
 	public TLSUpdater(Context ctx, String dbname, int hour, int minute) {
@@ -28,19 +30,20 @@ public class TLSUpdater {
 	}
 
 	public void run() {
-		Log.i(DEBUG_TAG, "Set the alarm");
 		// get a Calendar object with current time
 		Calendar updateTime = Calendar.getInstance();
 		updateTime.setTimeZone(TimeZone.getDefault());
-		updateTime.set(Calendar.HOUR_OF_DAY, hour);
-		updateTime.set(Calendar.MINUTE, minute);
+		updateTime.set(Calendar.HOUR_OF_DAY, 13);
+		updateTime.set(Calendar.MINUTE, 14);
+//		updateTime.add(Calendar.SECOND, START_DELAY);
+		Log.i(DEBUG_TAG, "Set the alarm to the time: " + updateTime.getTime());
 
 		alarm_intent = new Intent(context, AlarmReceiver.class);
 		alarm_intent.putExtra("dbname", dbname);
 		upload = PendingIntent.getBroadcast(context, 0, alarm_intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
-		alarmm.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				updateTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, upload);
+		alarmm.setRepeating(AlarmManager.RTC_WAKEUP, updateTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, upload);
+//		alarmm.setInexactRepeating(AlarmManager.RTC_WAKEUP, updateTime.getTimeInMillis(), UPDATE_INTERVAL, upload);
 	}
 
 	public void stop() {

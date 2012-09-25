@@ -2,22 +2,16 @@ package com.yyl.myrmex.tlsupdater;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -29,24 +23,50 @@ public class UpdateTask extends AsyncTask<Void, Void, Boolean> {
 	private MyTLSClient client;
 	private HttpPost httppost;
 	private HttpResponse getResponse;
+	private String ns;
+	private NotificationManager mNotificationManager;
+	private NotificationCompat.Builder builder;
+
 	private String db_name;
 	private ArrayList<String> result;
 	private String DEBUG_TAG = "AsyncTask: UpdateTask";
+	private static int TASK_ID = 1;
 
 	public UpdateTask(Context ctx, String name) {
 		context = ctx;
 		db_name = name;
+		ns = Context.NOTIFICATION_SERVICE;
+		mNotificationManager = (NotificationManager) context
+				.getSystemService(ns);
+		builder = new NotificationCompat.Builder(context)
+				.setContentTitle("Task test").setContentText("This is a test.")
+				.setSmallIcon(R.drawable.ic_launcher).setOngoing(true);
+
 		Log.d(DEBUG_TAG, "task created");
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
 		Log.i(DEBUG_TAG, "now doing it in the background!");
+
+		Notification notification = builder.getNotification();
+		mNotificationManager.notify(TASK_ID, notification);
+
 		String db_path = context.getDatabasePath(db_name).getAbsolutePath();
 		Log.i(DEBUG_TAG, "db full path: " + db_path);
 		db = SQLiteDatabase.openDatabase(db_path, null,
 				SQLiteDatabase.OPEN_READWRITE);
 		dbe = new DatabaseExporter(db);
+
+		long endTime = System.currentTimeMillis() + 5 * 1000;
+		while (System.currentTimeMillis() < endTime) {
+			synchronized (this) {
+				try {
+					wait(endTime - System.currentTimeMillis());
+				} catch (Exception e) {
+				}
+			}
+		}
 
 		try {
 			result = dbe.export(db_name);
@@ -95,6 +115,7 @@ public class UpdateTask extends AsyncTask<Void, Void, Boolean> {
 		} else {
 			Toast.makeText(context, "Task failed", Toast.LENGTH_SHORT).show();
 		}
+		mNotificationManager.cancel(TASK_ID);
 	}
 
 }
