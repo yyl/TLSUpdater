@@ -17,8 +17,6 @@ public class TLSUpdater {
 
 	private String dbname;
 	private int hour, minute;
-	private long UPDATE_INTERVAL = 30000;
-	private int START_DELAY = 2;
 	private String DEBUG_TAG = "TLSUpdater";
 
 	public TLSUpdater(Context ctx, String dbname, int hour, int minute) {
@@ -40,6 +38,8 @@ public class TLSUpdater {
 
 		alarm_intent = new Intent(context, AlarmReceiver.class);
 		alarm_intent.putExtra("dbname", dbname);
+		alarm_intent.putExtra("hour", this.hour);
+		alarm_intent.putExtra("minute", this.minute);
 		upload = PendingIntent.getBroadcast(context, 0, alarm_intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmm.setRepeating(AlarmManager.RTC_WAKEUP, updateTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, upload);

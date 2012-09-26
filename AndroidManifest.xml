@@ -21,7 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".AlertActivity" 
+            android:theme="@android:style/Theme.Translucent">
+            </activity>
 		<receiver android:name="com.yyl.myrmex.tlsupdater.AlarmReceiver"></receiver>
+		<service android:enabled="true" android:name=".UpdateIntent"/>
     </application>
 
 </manifest>
