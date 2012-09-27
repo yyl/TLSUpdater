@@ -55,7 +55,7 @@ public class TLSUpdater {
 		alarmm.cancel(upload);
 	}
 
-	public void exportSchema() {
+	public void exportSchema(String create_query, String filename) {
 		Log.i(DEBUG_TAG, "Export schema to a file");
 	}
 }

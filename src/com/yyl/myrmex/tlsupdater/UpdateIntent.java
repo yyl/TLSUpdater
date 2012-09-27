@@ -85,13 +85,13 @@ public class UpdateIntent extends IntentService {
 			alarmm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 			alarm_intent = new Intent(getBaseContext(), AlarmReceiver.class);
 			int hour = intent.getIntExtra("hour", 18);
-			int minute = intent.getIntExtra("minute", 0) + 1;
+			int minute = intent.getIntExtra("minute", 0) + 2;
 			alarm_intent.putExtra("dbname", intent.getCharSequenceExtra("dbname"));
 			alarm_intent.putExtra("hour", hour);
 			alarm_intent.putExtra("minute", minute);
 			upload = PendingIntent.getBroadcast(getBaseContext(), 0,
 					alarm_intent, PendingIntent.FLAG_CANCEL_CURRENT);
-			if (minute >= 3) {
+			if (minute >= 60) {
 				Log.i(DEBUG_TAG, "Stop the alarm due to consecutively fail to upload the data.");
 				alarmm.cancel(upload);
 			} else {
