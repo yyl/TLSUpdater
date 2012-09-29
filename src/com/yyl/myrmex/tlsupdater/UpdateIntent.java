@@ -1,20 +1,9 @@
 package com.yyl.myrmex.tlsupdater;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.TimeZone;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -38,8 +27,7 @@ public class UpdateIntent extends IntentService {
 	private NotificationManager mNotificationManager;
 	private NotificationCompat.Builder builder;
 	private SQLiteDatabase db;
-	// private DatabaseExporter dbe;
-	private MyTLSClient tlser;
+	private DataStreamer dstreamer;
 
 	private String db_name;
 	private ArrayList<String> result;
@@ -57,7 +45,6 @@ public class UpdateIntent extends IntentService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.i(DEBUG_TAG, "Welcome to the new updateTask, update intent!");
 	}
 
 	/**
@@ -67,11 +54,11 @@ public class UpdateIntent extends IntentService {
 	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Log.i(DEBUG_TAG, "Receiving an intent");
+		Log.i(DEBUG_TAG, "Receiving an intent, service starts...");
 		if (hasConnectivity()) {
-			Log.i(DEBUG_TAG, "Connectivity is good; now start the upload task.");
+			Log.i(DEBUG_TAG, "Connectivity is good; now start the upload task...");
 			context = getBaseContext();
-			
+
 			mNotificationManager = (NotificationManager) context
 					.getSystemService(Context.NOTIFICATION_SERVICE);
 			builder = new NotificationCompat.Builder(context)
@@ -83,39 +70,13 @@ public class UpdateIntent extends IntentService {
 
 			db_name = (String) intent.getCharSequenceExtra("dbname");
 			String db_path = context.getDatabasePath(db_name).getAbsolutePath();
-			Log.i(DEBUG_TAG, "db full path: " + db_path);
+//			Log.i(DEBUG_TAG, "db full path: " + db_path);
+
 			db = SQLiteDatabase.openDatabase(db_path, null,
 					SQLiteDatabase.OPEN_READWRITE);
-			// dbe = new DatabaseExporter(db);
-			// try {
-			//
-			// result = dbe.export(db_name);
-			// Log.i(DEBUG_TAG, "db data:" + result);
-			// } catch (IOException e) {
-			// e.printStackTrace();
-			// }
-			tlser = new MyTLSClient(context);
-			String serverUrl = "https://ec2-174-129-109-240.compute-1.amazonaws.com/cgi-bin/echo.py";
-			HttpPost httppost = new HttpPost(serverUrl);
+			dstreamer = new DataStreamer(db, context);
 			try {
-				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-				nameValuePairs.add(new BasicNameValuePair("user", "yyl"));
-				nameValuePairs.add(new BasicNameValuePair("time", "20120929"));
-
-				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-				HttpResponse response = tlser.execute(httppost);
-				Log.d(DEBUG_TAG, "get response from the server");
-				InputStream inputStream = response.getEntity().getContent();
-				BufferedReader r = new BufferedReader(new InputStreamReader(
-						inputStream));
-				String line;
-				while ((line = r.readLine()) != null) {
-					Log.i(DEBUG_TAG, line);
-				}
-				Log.i(DEBUG_TAG, "request complete");
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
+				dstreamer.stream(db_name);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -157,8 +118,8 @@ public class UpdateIntent extends IntentService {
 		mNotificationManager.cancel(TASK_ID);
 		Log.i(DEBUG_TAG, "Intent service finished.");
 	}
-	
-	public boolean hasConnectivity() {
+
+	private boolean hasConnectivity() {
 		ConnectivityManager cm = (ConnectivityManager) getBaseContext()
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo netInfo = cm.getActiveNetworkInfo();
