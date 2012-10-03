@@ -30,6 +30,7 @@ public class UpdateIntent extends IntentService {
 	private DataStreamer dstreamer;
 	private String db_name;
 	private ArrayList<String> result;
+	private Utilities utility;
 
 	private static int TASK_ID = 1;
 	private static String DEBUG_TAG = "IntentService: UpdateIntent";
@@ -45,6 +46,7 @@ public class UpdateIntent extends IntentService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		utility = new Utilities();
 	}
 
 	/**
@@ -54,6 +56,7 @@ public class UpdateIntent extends IntentService {
 	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		utility.writeToFile(utility.noPostfix(db_name), utility.today());
 		Log.i(DEBUG_TAG, "Receiving an intent, service starts...");
 		if (hasConnectivity()) {
 			Log.i(DEBUG_TAG,

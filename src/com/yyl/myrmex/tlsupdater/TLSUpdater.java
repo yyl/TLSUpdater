@@ -32,7 +32,6 @@ public class TLSUpdater {
 		this.dbname = dbname;
 		this.hour = hour;
 		this.minute = minute;
-		// initialization for file IO, create the folder to contain files
 		utility = new Utilities();
 	}
 
