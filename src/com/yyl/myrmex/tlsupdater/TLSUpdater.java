@@ -19,9 +19,9 @@ public class TLSUpdater {
 	private Intent alarm_intent;
 	private PendingIntent upload;
 	private AlarmManager alarmm;
-	private File logFile, dir, dateFile;
 	private String dbname = "nodb";
 	private int hour, minute;
+	private Utilities utility;
 
 	private static String DEBUG_TAG = "TLSUpdater";
 	private static final String LOG_PATH = "/tlsupdater";
@@ -33,19 +33,7 @@ public class TLSUpdater {
 		this.hour = hour;
 		this.minute = minute;
 		// initialization for file IO, create the folder to contain files
-		dir = new File(Environment.getExternalStorageDirectory(), LOG_PATH);
-		if (!dir.exists()) {
-			dir.mkdirs();
-		}
-		dateFile = new File(dir, "datesToUpload");
-		if (!dateFile.exists()) {
-			try {
-				Log.i(DEBUG_TAG, "datesToUpload File does not exist, creating it now");
-				dateFile.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		utility = new Utilities();
 	}
 
 	public void run() {
@@ -81,28 +69,6 @@ public class TLSUpdater {
 	public void exportSchema(String create_query) {
 		String filename = this.dbname.replace(".db", "");
 		Log.i(DEBUG_TAG, "Export schema to file " + filename);
-		logFile = new File(dir, filename);
-		if (!logFile.exists()) {
-			try {
-				Log.i(DEBUG_TAG, "File does not exist, creating it now");
-				logFile.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		try {
-			// BufferedWriter for performance, true to set append to file flag
-			BufferedWriter buf = new BufferedWriter(new FileWriter(logFile,
-					true));
-			buf.append(create_query);
-			buf.newLine();
-			buf.close();
-			Log.i(DEBUG_TAG, "Writing a new line to the file");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		utility.writeToFile(filename, create_query);
 	}
-
 }
