@@ -28,11 +28,11 @@ public class UpdateIntent extends IntentService {
 	private NotificationCompat.Builder builder;
 	private SQLiteDatabase db;
 	private DataStreamer dstreamer;
-
 	private String db_name;
 	private ArrayList<String> result;
+
 	private static int TASK_ID = 1;
-	private String DEBUG_TAG = "IntentService: UpdateIntent";
+	private static String DEBUG_TAG = "IntentService: UpdateIntent";
 
 	/**
 	 * A constructor is required, and must call the super IntentService(String)
@@ -56,21 +56,22 @@ public class UpdateIntent extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		Log.i(DEBUG_TAG, "Receiving an intent, service starts...");
 		if (hasConnectivity()) {
-			Log.i(DEBUG_TAG, "Connectivity is good; now start the upload task...");
+			Log.i(DEBUG_TAG,
+					"Connectivity is good; now start the upload task...");
 			context = getBaseContext();
 
 			mNotificationManager = (NotificationManager) context
 					.getSystemService(Context.NOTIFICATION_SERVICE);
 			builder = new NotificationCompat.Builder(context)
-					.setContentTitle("Task test")
-					.setContentText("This is a test.")
+					.setContentTitle("TLSUpdater")
+					.setContentText("Uploading new data collected today...")
 					.setSmallIcon(R.drawable.ic_launcher).setOngoing(true);
 			Notification notification = builder.getNotification();
 			mNotificationManager.notify(TASK_ID, notification);
 
 			db_name = (String) intent.getCharSequenceExtra("dbname");
 			String db_path = context.getDatabasePath(db_name).getAbsolutePath();
-//			Log.i(DEBUG_TAG, "db full path: " + db_path);
+			// Log.i(DEBUG_TAG, "db full path: " + db_path);
 
 			db = SQLiteDatabase.openDatabase(db_path, null,
 					SQLiteDatabase.OPEN_READWRITE);

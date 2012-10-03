@@ -2,7 +2,6 @@ package com.yyl.myrmex.tlsupdater;
 
 import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.Security;
 
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
@@ -27,7 +26,7 @@ public class MyTLSClient extends DefaultHttpClient {
 		// Register for port 443 our SSLSocketFactory with our keystore
 		// to the ConnectionManager
 		registry.register(new Scheme("https", newSslSocketFactory(), 443));
-//		registry.register(new Scheme("http", newSslSocketFactory(), 2727));
+		// registry.register(new Scheme("http", newSslSocketFactory(), 2727));
 		SingleClientConnManager cm = new SingleClientConnManager(getParams(),
 				registry);
 		return cm;

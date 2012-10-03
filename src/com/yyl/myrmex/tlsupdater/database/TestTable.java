@@ -25,8 +25,13 @@ public class TestTable {
 		database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
 		database.execSQL(TABLE_CREATE);
 		System.out.println("database created");
-		database.execSQL(addOneEntry("2010", "value1"));
-		database.execSQL(addOneEntry("2011", "value2"));
+		database.execSQL(addOneEntry("20120925", "value1of20120925"));
+		database.execSQL(addOneEntry("20120925", "value2of20120925"));
+		database.execSQL(addOneEntry("20120925", "value3of20120925"));
+		database.execSQL(addOneEntry("20121001", "value1of20121001"));
+		database.execSQL(addOneEntry("20121001", "value2of20121001"));
+		database.execSQL(addOneEntry("20121002", "value1of20121002"));
+		database.execSQL(addOneEntry("20121002", "value2of20121002"));
 		System.out.println("new entry added");
 	}
 

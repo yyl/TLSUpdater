@@ -19,11 +19,11 @@ public class TLSUpdater {
 	private Intent alarm_intent;
 	private PendingIntent upload;
 	private AlarmManager alarmm;
-	private File logFile, dir;
+	private File logFile, dir, dateFile;
 	private String dbname = "nodb";
 	private int hour, minute;
 
-	private String DEBUG_TAG = "TLSUpdater";
+	private static String DEBUG_TAG = "TLSUpdater";
 	private static final String LOG_PATH = "/tlsupdater";
 
 	public TLSUpdater(Context ctx, String dbname, int hour, int minute) {
@@ -36,6 +36,15 @@ public class TLSUpdater {
 		dir = new File(Environment.getExternalStorageDirectory(), LOG_PATH);
 		if (!dir.exists()) {
 			dir.mkdirs();
+		}
+		dateFile = new File(dir, "datesToUpload");
+		if (!dateFile.exists()) {
+			try {
+				Log.i(DEBUG_TAG, "datesToUpload File does not exist, creating it now");
+				dateFile.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -95,4 +104,5 @@ public class TLSUpdater {
 			e.printStackTrace();
 		}
 	}
+
 }
