@@ -18,7 +18,7 @@ import android.util.Log;
 
 public class Utilities {
 	private File dir;
-
+	private Scanner sc;
 	private static final String DEBUG_TAG = "Utilities";
 	private static final String FILE_PATH = "/tlsupdater";
 
@@ -51,12 +51,13 @@ public class Utilities {
 		File dateFile = new File(dir, filename);
 		try {
 			// BufferedWriter for performance, true to set append to file flag
-			Log.i(DEBUG_TAG, "Writing a new line to the file");
+			Log.i(DEBUG_TAG, "Writing " + line + " to the file");
 			BufferedWriter buf = new BufferedWriter(new FileWriter(dateFile,
 					true));
 			buf.append(line);
 			buf.newLine();
 			buf.close();
+			Log.i(DEBUG_TAG, "Writing complete");
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -64,22 +65,33 @@ public class Utilities {
 		}
 	}
 
-	public String readLine(String filename) {
-		Scanner sc = null;
+	public String readLineFromFile(String filename) {
+		sc = null;
 		try {
 			sc = new Scanner(new File(this.dir, filename));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (sc.hasNextLine())
+		if (sc.hasNextLine()) {
+			Log.i(DEBUG_TAG, "Read one line from the file " + filename);
 			return sc.nextLine();
-		else
+		} else
 			return null;
 	}
 
-	public void remove(String file, String lineToRemove) {
+	public boolean hasNextLine(String filename) {
+		try {
+			sc = new Scanner(new File(this.dir, filename));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return sc.hasNextLine();
+	}
 
+	public void removeFromFile(String file, String lineToRemove) {
+		Log.i(DEBUG_TAG, "Deleting " + lineToRemove + " from file " + file);
 		try {
 			File inFile = new File(dir, file);
 
@@ -125,6 +137,7 @@ public class Utilities {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+		Log.i(DEBUG_TAG, "Deleting complete.");
 	}
 
 	public String today() {

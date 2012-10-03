@@ -1,7 +1,6 @@
 package com.yyl.myrmex.tlsupdater;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -29,11 +28,11 @@ public class UpdateIntent extends IntentService {
 	private SQLiteDatabase db;
 	private DataStreamer dstreamer;
 	private String db_name;
-	private ArrayList<String> result;
 	private Utilities utility;
 
-	private static int TASK_ID = 1;
-	private static String DEBUG_TAG = "IntentService: UpdateIntent";
+	private static final String dateFilename = "uploadDatesFile";
+	private static final int TASK_ID = 1;
+	private static final String DEBUG_TAG = "IntentService: UpdateIntent";
 
 	/**
 	 * A constructor is required, and must call the super IntentService(String)
@@ -56,13 +55,14 @@ public class UpdateIntent extends IntentService {
 	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		utility.writeToFile(utility.noPostfix(db_name), utility.today());
-		Log.i(DEBUG_TAG, "Receiving an intent, service starts...");
+		Log.i(DEBUG_TAG, "Receiving an intent, update service starts...");
 		if (hasConnectivity()) {
 			Log.i(DEBUG_TAG,
 					"Connectivity is good; now start the upload task...");
+			utility.writeToFile(dateFilename, utility.today());
 			context = getBaseContext();
 
+			// set the notification in status bar
 			mNotificationManager = (NotificationManager) context
 					.getSystemService(Context.NOTIFICATION_SERVICE);
 			builder = new NotificationCompat.Builder(context)
@@ -72,15 +72,20 @@ public class UpdateIntent extends IntentService {
 			Notification notification = builder.getNotification();
 			mNotificationManager.notify(TASK_ID, notification);
 
-			db_name = (String) intent.getCharSequenceExtra("dbname");
+			db_name = intent.getStringExtra("dbName");
 			String db_path = context.getDatabasePath(db_name).getAbsolutePath();
-			// Log.i(DEBUG_TAG, "db full path: " + db_path);
 
 			db = SQLiteDatabase.openDatabase(db_path, null,
 					SQLiteDatabase.OPEN_READWRITE);
 			dstreamer = new DataStreamer(db, context);
 			try {
-				dstreamer.stream(db_name);
+				while (utility.hasNextLine(dateFilename)) {
+					String line = utility.readLineFromFile(dateFilename);
+					if (dstreamer.stream(db_name, line)) {
+						utility.removeFromFile(dateFilename, line);
+					}
+				}
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -88,16 +93,16 @@ public class UpdateIntent extends IntentService {
 		} else {
 			Log.i(DEBUG_TAG, "No connectivity available at this time.");
 			alarmm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-			alarm_intent = new Intent(getBaseContext(), AlarmReceiver.class);
-			int hour = intent.getIntExtra("hour", 18);
-			int minute = intent.getIntExtra("minute", 0) + 2;
+			alarm_intent = new Intent(getBaseContext(), TLSAlarmReceiver.class);
+			int hour = intent.getIntExtra("hour", 18) + 1;
+			int minute = intent.getIntExtra("minute", 0);
 			alarm_intent.putExtra("dbname",
 					intent.getCharSequenceExtra("dbname"));
 			alarm_intent.putExtra("hour", hour);
 			alarm_intent.putExtra("minute", minute);
 			upload = PendingIntent.getBroadcast(getBaseContext(), 0,
 					alarm_intent, PendingIntent.FLAG_CANCEL_CURRENT);
-			if (minute >= 60) {
+			if (hour >= 24) {
 				Log.i(DEBUG_TAG,
 						"Stop the alarm due to consecutively fail to upload the data.");
 				alarmm.cancel(upload);
@@ -120,7 +125,7 @@ public class UpdateIntent extends IntentService {
 	public void onDestroy() {
 		super.onDestroy();
 		mNotificationManager.cancel(TASK_ID);
-		Log.i(DEBUG_TAG, "Intent service finished.");
+		Log.i(DEBUG_TAG, "Upload service finished.");
 	}
 
 	private boolean hasConnectivity() {

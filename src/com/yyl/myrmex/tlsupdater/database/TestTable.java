@@ -30,8 +30,9 @@ public class TestTable {
 		database.execSQL(addOneEntry("20120925", "value3of20120925"));
 		database.execSQL(addOneEntry("20121001", "value1of20121001"));
 		database.execSQL(addOneEntry("20121001", "value2of20121001"));
-		database.execSQL(addOneEntry("20121002", "value1of20121002"));
-		database.execSQL(addOneEntry("20121002", "value2of20121002"));
+		database.execSQL(addOneEntry("20121003", "value1of20121003"));
+		database.execSQL(addOneEntry("20121003", "value2of20121003"));
+		database.execSQL(addOneEntry("20121003", "value3of20121003"));
 		System.out.println("new entry added");
 	}
 

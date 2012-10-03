@@ -1,9 +1,5 @@
 package com.yyl.myrmex.tlsupdater;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -11,7 +7,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Environment;
 import android.util.Log;
 
 public class TLSUpdater {
@@ -24,7 +19,6 @@ public class TLSUpdater {
 	private Utilities utility;
 
 	private static String DEBUG_TAG = "TLSUpdater";
-	private static final String LOG_PATH = "/tlsupdater";
 
 	public TLSUpdater(Context ctx, String dbname, int hour, int minute) {
 		context = ctx;
@@ -44,7 +38,7 @@ public class TLSUpdater {
 		// updateTime.add(Calendar.SECOND, START_DELAY);
 		Log.i(DEBUG_TAG, "Set the alarm to the time: " + updateTime.getTime());
 
-		alarm_intent = new Intent(context, AlarmReceiver.class);
+		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
 		alarm_intent.putExtra("dbname", dbname);
 		alarm_intent.putExtra("hour", this.hour);
 		alarm_intent.putExtra("minute", this.minute);
@@ -52,13 +46,11 @@ public class TLSUpdater {
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmm.setRepeating(AlarmManager.RTC_WAKEUP,
 				updateTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, upload);
-		// alarmm.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-		// updateTime.getTimeInMillis(), UPDATE_INTERVAL, upload);
 	}
 
 	public void stop() {
 		Log.i(DEBUG_TAG, "Stop the alarm");
-		alarm_intent = new Intent(context, AlarmReceiver.class);
+		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
 		upload = PendingIntent.getBroadcast(context, 0, alarm_intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
