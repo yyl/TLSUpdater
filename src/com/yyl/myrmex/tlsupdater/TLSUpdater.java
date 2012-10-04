@@ -20,7 +20,7 @@ public class TLSUpdater {
 	private SharedPreferences spreference;
 
 	private static String DEBUG_TAG = "TLSUpdater";
-	private static final String TLS_PREF = "tlsupdater preference";
+	public static final String TLS_PREF = "tlsupdater preference";
 
 	public TLSUpdater(Context ctx, String dbname, int hour, int minute) {
 		context = ctx;
@@ -52,7 +52,6 @@ public class TLSUpdater {
 		SharedPreferences.Editor editor = spreference.edit();
 		editor.putInt("hour", this.hour);
 		editor.putInt("minute", this.minute);
-		editor.putInt("pointer", 0);
 		editor.commit();
 	}
 
