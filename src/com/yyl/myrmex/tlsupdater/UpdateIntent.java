@@ -23,15 +23,12 @@ public class UpdateIntent extends IntentService {
 	private Intent alarm_intent;
 	private PendingIntent upload;
 	private Context context;
-	private NotificationManager mNotificationManager;
-	private NotificationCompat.Builder builder;
 	private SQLiteDatabase db;
 	private DataStreamer dstreamer;
 	private String db_name;
 	private Utilities utility;
 
 	private static final String dateFilename = "uploadDatesFile";
-	private static final int TASK_ID = 136798876;
 	private static final String DEBUG_TAG = "IntentService: UpdateIntent";
 
 	/**
@@ -47,8 +44,6 @@ public class UpdateIntent extends IntentService {
 		super.onCreate();
 		utility = new Utilities();
 		context = getBaseContext();
-		mNotificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
 	/**
@@ -64,26 +59,19 @@ public class UpdateIntent extends IntentService {
 		if (hasConnectivity()) {
 			Log.i(DEBUG_TAG,
 					"Connectivity is good; now start the upload task...");
-
-			// set the notification in status bar
-			builder = new NotificationCompat.Builder(context)
-					.setContentTitle("TLSUpdater")
-					.setContentText("Uploading new data collected today...")
-					.setSmallIcon(R.drawable.ic_launcher).setOngoing(true);
-			Notification notification = builder.getNotification();
-			mNotificationManager.notify(TASK_ID, notification);
 			String db_path = context.getDatabasePath(db_name).getAbsolutePath();
 
 			db = SQLiteDatabase.openDatabase(db_path, null,
 					SQLiteDatabase.OPEN_READWRITE);
 			dstreamer = new DataStreamer(db, context);
 			try {
-				while (utility.hasNextLine(dateFilename)) {
-					String line = utility.readLineFromFile(dateFilename);
-					if (dstreamer.stream(utility.noPostfix(db_name), line)) {
-						utility.removeFromFile(dateFilename, line);
-					}
-				}
+				// while (utility.hasNextLine(dateFilename)) {
+				// String line = utility.readLineFromFile(dateFilename);
+				// if (dstreamer.stream(utility.noPostfix(db_name), line)) {
+				// utility.removeFromFile(dateFilename, line);
+				// }
+				// }
+				dstreamer.stream(utility.noPostfix(db_name));
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -122,8 +110,6 @@ public class UpdateIntent extends IntentService {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
-		mNotificationManager.cancel(TASK_ID);
 		Log.i(DEBUG_TAG, "Upload service finished.");
 	}
 
