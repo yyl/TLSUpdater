@@ -17,7 +17,6 @@ public class TLSUpdater {
 	private AlarmManager alarmm;
 	private String dbname = "nodb";
 	private int hour, minute;
-	private Utilities utility;
 	private SharedPreferences spreference;
 
 	private static String DEBUG_TAG = "TLSUpdater";
@@ -29,7 +28,6 @@ public class TLSUpdater {
 		this.dbname = dbname;
 		this.hour = hour;
 		this.minute = minute;
-		utility = new Utilities();
 		spreference = context.getSharedPreferences(TLS_PREF, 0);
 	}
 

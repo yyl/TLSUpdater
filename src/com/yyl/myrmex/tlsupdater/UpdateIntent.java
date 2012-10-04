@@ -26,7 +26,6 @@ public class UpdateIntent extends IntentService {
 	private SQLiteDatabase db;
 	private DataStreamer dstreamer;
 	private String db_name;
-	private Utilities utility;
 
 	private static final String dateFilename = "uploadDatesFile";
 	private static final String DEBUG_TAG = "IntentService: UpdateIntent";
@@ -42,7 +41,6 @@ public class UpdateIntent extends IntentService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		utility = new Utilities();
 		context = getBaseContext();
 	}
 
@@ -54,7 +52,6 @@ public class UpdateIntent extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Log.i(DEBUG_TAG, "Receiving an intent, update service starts...");
-		utility.writeToFile(dateFilename, utility.today());
 		db_name = intent.getStringExtra("dbName");
 		if (hasConnectivity()) {
 			Log.i(DEBUG_TAG,
@@ -65,14 +62,7 @@ public class UpdateIntent extends IntentService {
 					SQLiteDatabase.OPEN_READWRITE);
 			dstreamer = new DataStreamer(db, context);
 			try {
-				// while (utility.hasNextLine(dateFilename)) {
-				// String line = utility.readLineFromFile(dateFilename);
-				// if (dstreamer.stream(utility.noPostfix(db_name), line)) {
-				// utility.removeFromFile(dateFilename, line);
-				// }
-				// }
-				dstreamer.stream(utility.noPostfix(db_name));
-
+				dstreamer.stream(db_name);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
