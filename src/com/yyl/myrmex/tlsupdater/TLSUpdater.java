@@ -18,8 +18,10 @@ public class TLSUpdater {
 	private String dbname = "nodb";
 	private int hour, minute;
 	private Utilities utility;
+	private SharedPreferences spreference;
 
 	private static String DEBUG_TAG = "TLSUpdater";
+	private static final String TLS_PREF = "tlsupdater preference";
 
 	public TLSUpdater(Context ctx, String dbname, int hour, int minute) {
 		context = ctx;
@@ -28,6 +30,7 @@ public class TLSUpdater {
 		this.hour = hour;
 		this.minute = minute;
 		utility = new Utilities();
+		spreference = context.getSharedPreferences(TLS_PREF, 0);
 	}
 
 	public void run() {
@@ -47,6 +50,12 @@ public class TLSUpdater {
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmm.setRepeating(AlarmManager.RTC_WAKEUP,
 				updateTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, upload);
+		
+		SharedPreferences.Editor editor = spreference.edit();
+		editor.putInt("hour", this.hour);
+		editor.putInt("minute", this.minute);
+		editor.putInt("pointer", 0);
+		editor.commit();
 	}
 
 	public void stop() {
