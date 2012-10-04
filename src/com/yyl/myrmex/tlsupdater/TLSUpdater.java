@@ -66,10 +66,4 @@ public class TLSUpdater {
 		alarmm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmm.cancel(upload);
 	}
-
-	public void exportSchema(String create_query) {
-		String filename = this.dbname.replace(".db", "");
-		Log.i(DEBUG_TAG, "Export schema to file " + filename);
-		utility.writeToFile(filename, create_query);
-	}
 }
