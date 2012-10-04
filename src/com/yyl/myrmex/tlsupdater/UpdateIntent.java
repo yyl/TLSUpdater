@@ -31,7 +31,7 @@ public class UpdateIntent extends IntentService {
 	private Utilities utility;
 
 	private static final String dateFilename = "uploadDatesFile";
-	private static final int TASK_ID = 1;
+	private static final int TASK_ID = 136798876;
 	private static final String DEBUG_TAG = "IntentService: UpdateIntent";
 
 	/**
@@ -46,6 +46,9 @@ public class UpdateIntent extends IntentService {
 	public void onCreate() {
 		super.onCreate();
 		utility = new Utilities();
+		context = getBaseContext();
+		mNotificationManager = (NotificationManager) context
+				.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
 	/**
@@ -56,23 +59,19 @@ public class UpdateIntent extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Log.i(DEBUG_TAG, "Receiving an intent, update service starts...");
+		utility.writeToFile(dateFilename, utility.today());
+		db_name = intent.getStringExtra("dbName");
 		if (hasConnectivity()) {
 			Log.i(DEBUG_TAG,
 					"Connectivity is good; now start the upload task...");
-			utility.writeToFile(dateFilename, utility.today());
-			context = getBaseContext();
 
 			// set the notification in status bar
-			mNotificationManager = (NotificationManager) context
-					.getSystemService(Context.NOTIFICATION_SERVICE);
 			builder = new NotificationCompat.Builder(context)
 					.setContentTitle("TLSUpdater")
 					.setContentText("Uploading new data collected today...")
 					.setSmallIcon(R.drawable.ic_launcher).setOngoing(true);
 			Notification notification = builder.getNotification();
 			mNotificationManager.notify(TASK_ID, notification);
-
-			db_name = intent.getStringExtra("dbName");
 			String db_path = context.getDatabasePath(db_name).getAbsolutePath();
 
 			db = SQLiteDatabase.openDatabase(db_path, null,
@@ -81,7 +80,7 @@ public class UpdateIntent extends IntentService {
 			try {
 				while (utility.hasNextLine(dateFilename)) {
 					String line = utility.readLineFromFile(dateFilename);
-					if (dstreamer.stream(db_name, line)) {
+					if (dstreamer.stream(utility.noPostfix(db_name), line)) {
 						utility.removeFromFile(dateFilename, line);
 					}
 				}
@@ -94,10 +93,9 @@ public class UpdateIntent extends IntentService {
 			Log.i(DEBUG_TAG, "No connectivity available at this time.");
 			alarmm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 			alarm_intent = new Intent(getBaseContext(), TLSAlarmReceiver.class);
-			int hour = intent.getIntExtra("hour", 18) + 1;
-			int minute = intent.getIntExtra("minute", 0);
-			alarm_intent.putExtra("dbname",
-					intent.getCharSequenceExtra("dbname"));
+			int hour = intent.getIntExtra("hour", 18);
+			int minute = intent.getIntExtra("minute", 0) + 2;
+			alarm_intent.putExtra("dbName", db_name);
 			alarm_intent.putExtra("hour", hour);
 			alarm_intent.putExtra("minute", minute);
 			upload = PendingIntent.getBroadcast(getBaseContext(), 0,
@@ -124,6 +122,7 @@ public class UpdateIntent extends IntentService {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+
 		mNotificationManager.cancel(TASK_ID);
 		Log.i(DEBUG_TAG, "Upload service finished.");
 	}

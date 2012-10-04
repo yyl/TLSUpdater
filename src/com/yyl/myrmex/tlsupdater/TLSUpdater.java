@@ -39,7 +39,7 @@ public class TLSUpdater {
 		Log.i(DEBUG_TAG, "Set the alarm to the time: " + updateTime.getTime());
 
 		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
-		alarm_intent.putExtra("dbname", dbname);
+		alarm_intent.putExtra("dbName", dbname);
 		alarm_intent.putExtra("hour", this.hour);
 		alarm_intent.putExtra("minute", this.minute);
 		upload = PendingIntent.getBroadcast(context, 0, alarm_intent,

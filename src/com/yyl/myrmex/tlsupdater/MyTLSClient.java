@@ -1,5 +1,7 @@
 package com.yyl.myrmex.tlsupdater;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.KeyStore;
 
@@ -38,8 +40,11 @@ public class MyTLSClient extends DefaultHttpClient {
 			KeyStore trusted = KeyStore.getInstance("BKS");
 			// Get the raw resource, which contains the keystore with
 			// your trusted certificates (root and any intermediate certs)
-			InputStream in = context.getResources().openRawResource(
-					R.raw.mykeystore);
+//			InputStream in = context.getResources().openRawResource(
+//					R.raw.mykeystore);
+//			File keyfile = new File(".", "mykeystore.bks");
+			String source = "mykeystore.bks";
+			InputStream in = getClass().getResourceAsStream(source);
 			try {
 				// Initialize the keystore with the provided trusted
 				// certificates
