@@ -1,5 +1,6 @@
 package com.yyl.myrmex.tlsupdater;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -8,6 +9,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class TLSUpdater {
@@ -18,6 +21,7 @@ public class TLSUpdater {
 	private String dbname = "nodb";
 	private int hour, minute;
 	private SharedPreferences spreference;
+	private Utilities ut;
 
 	private static String DEBUG_TAG = "TLSUpdater";
 	public static final String TLS_PREF = "tlsupdater preference";
@@ -29,6 +33,7 @@ public class TLSUpdater {
 		this.hour = hour;
 		this.minute = minute;
 		spreference = context.getSharedPreferences(TLS_PREF, 0);
+		this.ut = new Utilities();
 	}
 
 	public void run() {
@@ -48,7 +53,7 @@ public class TLSUpdater {
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmm.setRepeating(AlarmManager.RTC_WAKEUP,
 				updateTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, upload);
-		
+
 		SharedPreferences.Editor editor = spreference.edit();
 		editor.putInt("hour", this.hour);
 		editor.putInt("minute", this.minute);
@@ -62,5 +67,23 @@ public class TLSUpdater {
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmm.cancel(upload);
+	}
+
+	public void exportSchema() throws IOException {
+		String db_path = context.getDatabasePath(this.dbname).getAbsolutePath();
+		SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path, null,
+				SQLiteDatabase.OPEN_READWRITE);
+		String sql = "select sql from sqlite_master where name not in (\"android_metadata\", \"sqlite_sequence\") "
+				+ "and name not like \"uidx\"";
+		Cursor c = db.rawQuery(sql, new String[0]);
+		if (c.moveToFirst()) {
+			do {
+				String create = c.getString(c.getColumnIndex("sql"));
+				String filename = this.dbname.replace(".db", "");
+				ut.writeToFile(filename, create);
+				Log.d(DEBUG_TAG, "export schema to " + filename + ": " + create);
+			} while (c.moveToNext());
+		}
+		c.close();
 	}
 }

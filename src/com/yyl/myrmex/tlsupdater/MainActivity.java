@@ -1,5 +1,7 @@
 package com.yyl.myrmex.tlsupdater;
 
+import java.io.IOException;
+
 import com.yyl.myrmex.tlsupdater.database.TestDatabaseHelper;
 
 import android.os.Bundle;
@@ -37,13 +39,19 @@ public class MainActivity extends Activity {
     
     private OnClickListener mStartListener = new OnClickListener() {
         public void onClick(View v) {
-        	tls.run();
+//        	tls.run();
+        	try {
+				tls.exportSchema();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     };
 
     private OnClickListener mStopListener = new OnClickListener() {
         public void onClick(View v) {
-            tls.stop();
+//            tls.stop();
         }
     };
     

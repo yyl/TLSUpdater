@@ -84,7 +84,7 @@ public class UpdateIntent extends IntentService {
 
 			// reschedule: delay 1 hour or set back to default if it is another
 			// day
-			if (hour >= 24) {
+			if (minute >= 24) {
 				Log.i(DEBUG_TAG,
 						"Stop the alarm due to consecutively fail to upload the data.");
 				alarmm.cancel(upload);
