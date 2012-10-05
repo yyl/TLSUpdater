@@ -59,7 +59,7 @@ public class UpdateIntent extends IntentService {
 			String db_path = context.getDatabasePath(db_name).getAbsolutePath();
 
 			db = SQLiteDatabase.openDatabase(db_path, null,
-					SQLiteDatabase.OPEN_READWRITE);
+					SQLiteDatabase.OPEN_READONLY);
 			dstreamer = new DataStreamer(db, context);
 			try {
 				dstreamer.stream(db_name);

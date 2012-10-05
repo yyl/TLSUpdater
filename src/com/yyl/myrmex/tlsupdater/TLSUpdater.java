@@ -1,6 +1,5 @@
 package com.yyl.myrmex.tlsupdater;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -25,6 +24,9 @@ public class TLSUpdater {
 
 	private static String DEBUG_TAG = "TLSUpdater";
 	public static final String TLS_PREF = "tlsupdater preference";
+	private static final String SQL_DUMP_SCHEMA = "select sql from sqlite_master where name not in "
+			+ "(\"android_metadata\", \"sqlite_sequence\") "
+			+ "and name not like \"uidx\"";
 
 	public TLSUpdater(Context ctx, String dbname, int hour, int minute) {
 		context = ctx;
@@ -69,13 +71,11 @@ public class TLSUpdater {
 		alarmm.cancel(upload);
 	}
 
-	public void exportSchema() throws IOException {
+	public void exportSchema() {
 		String db_path = context.getDatabasePath(this.dbname).getAbsolutePath();
 		SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path, null,
-				SQLiteDatabase.OPEN_READWRITE);
-		String sql = "select sql from sqlite_master where name not in (\"android_metadata\", \"sqlite_sequence\") "
-				+ "and name not like \"uidx\"";
-		Cursor c = db.rawQuery(sql, new String[0]);
+				SQLiteDatabase.OPEN_READONLY);
+		Cursor c = db.rawQuery(SQL_DUMP_SCHEMA, new String[0]);
 		if (c.moveToFirst()) {
 			do {
 				String create = c.getString(c.getColumnIndex("sql"));
