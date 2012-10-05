@@ -140,13 +140,4 @@ public class Utilities {
 		Log.i(DEBUG_TAG, "Deleting complete.");
 	}
 
-	public String today() {
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		Date date = new Date();
-		return dateFormat.format(date);
-	}
-
-	public String noPostfix(String filename) {
-		return filename.replace(".db", "");
-	}
 }
