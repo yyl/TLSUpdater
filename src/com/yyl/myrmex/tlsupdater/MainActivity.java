@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 		b1.setOnClickListener(mStartListener);
 		b2 = (Button) findViewById(R.id.stop);
 		b2.setOnClickListener(mStopListener);
-		tls = new TLSUpdater(getBaseContext(), "test.db", 10, 39);
+		tls = new TLSUpdater(getBaseContext(), "test.db", 11, 37);
 
 		TestDatabaseHelper database = new TestDatabaseHelper(getBaseContext());
 		database.getWritableDatabase();
