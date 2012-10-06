@@ -12,7 +12,7 @@ public class TLSAlarmReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.i(DEBUG_TAG, "Receiving intent for repeating alarm: requesting upload task!");
+		Log.i(DEBUG_TAG, "Invoke the repeating alarm...");
 		dbname = (String) intent.getCharSequenceExtra("dbName");
 		Log.i(DEBUG_TAG, "get the db name: " + dbname);
 		// constructing the intent for UpdateIntent

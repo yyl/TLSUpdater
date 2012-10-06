@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 		b1.setOnClickListener(mStartListener);
 		b2 = (Button) findViewById(R.id.stop);
 		b2.setOnClickListener(mStopListener);
-		tls = new TLSUpdater(getBaseContext(), "test.db", 16, 5);
+		tls = new TLSUpdater(getBaseContext(), "test.db", 10, 39);
 
 		TestDatabaseHelper database = new TestDatabaseHelper(getBaseContext());
 		database.getWritableDatabase();
@@ -36,16 +36,15 @@ public class MainActivity extends Activity {
 
 	private OnClickListener mStartListener = new OnClickListener() {
 		public void onClick(View v) {
-			// tls.run();
-
-			tls.exportSchema();
+			tls.run();
+			// tls.exportSchema();
 
 		}
 	};
 
 	private OnClickListener mStopListener = new OnClickListener() {
 		public void onClick(View v) {
-			// tls.stop();
+			tls.stop();
 		}
 	};
 
