@@ -55,7 +55,7 @@ public class UpdateIntent extends IntentService {
 		db = SQLiteDatabase.openDatabase(db_path, null,
 				SQLiteDatabase.OPEN_READONLY);
 
-		dstreamer = new DataStreamer(db, context);
+		dstreamer = new DataStreamer(db, db_name, context);
 		if (dstreamer.moveToFirst()) {
 			boolean success = true;
 			do {

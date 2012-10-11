@@ -80,7 +80,7 @@ public class TLSUpdater {
 			do {
 				String create = c.getString(c.getColumnIndex("sql"));
 				String filename = this.dbname.replace(".db", "");
-				ut.writeToFile(filename, create);
+				ut.writeToFile(filename, create+";");
 				Log.d(DEBUG_TAG, "export schema to " + filename + ": " + create);
 			} while (c.moveToNext());
 		}
