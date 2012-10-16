@@ -52,6 +52,7 @@ public class UpdateIntent extends IntentService {
 		Log.i(DEBUG_TAG, "Receiving an intent, update service starts...");
 		db_name = intent.getStringExtra("dbName");
 		String db_path = context.getDatabasePath(db_name).getAbsolutePath();
+		
 		db = SQLiteDatabase.openDatabase(db_path, null,
 				SQLiteDatabase.OPEN_READONLY);
 
@@ -60,6 +61,7 @@ public class UpdateIntent extends IntentService {
 			boolean success = true;
 			do {
 				if (!hasConnectivity() || !success) {
+					dstreamer.close();
 					reschedule(intent);
 					break;
 				}
@@ -67,6 +69,8 @@ public class UpdateIntent extends IntentService {
 			} while (dstreamer.moveToNext());
 		}
 		dstreamer.close();
+		
+		db.close();
 
 	}
 
@@ -81,7 +85,7 @@ public class UpdateIntent extends IntentService {
 		alarmm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		alarm_intent = new Intent(getBaseContext(), TLSAlarmReceiver.class);
 		int hour = intent.getIntExtra("hour", 18);
-		int minute = intent.getIntExtra("minute", 0) + 2;
+		int minute = intent.getIntExtra("minute", 0);
 		alarm_intent.putExtra("dbName", db_name);
 		alarm_intent.putExtra("hour", hour);
 		alarm_intent.putExtra("minute", minute);
@@ -93,17 +97,17 @@ public class UpdateIntent extends IntentService {
 
 		// reschedule: delay 1 hour or set back to default if it is another
 		// day
-		if (hour >= 24) {
+		if (hour >= 23) {
 			Log.i(DEBUG_TAG,
-					"Stop the alarm due to consecutively fail to upload the data.");
-			alarmm.cancel(upload);
+					"Stop the alarm due to consecutively fail to upload the data. " + hour);
+//			alarmm.cancel(upload);
 
-			updateTime.set(Calendar.HOUR_OF_DAY, spref.getInt("hour", 18));
+			updateTime.add(Calendar.HOUR_OF_DAY, spref.getInt("hour", 0) + 1);
 			updateTime.set(Calendar.MINUTE, spref.getInt("minute", 0));
 			Log.i(DEBUG_TAG,
 					"Reset to the initial alarm time: " + updateTime.getTime());
 		} else {
-			updateTime.set(Calendar.HOUR_OF_DAY, hour);
+			updateTime.add(Calendar.HOUR_OF_DAY, 1);
 			updateTime.set(Calendar.MINUTE, minute);
 			Log.i(DEBUG_TAG,
 					"Reset the alarm to the time: " + updateTime.getTime());
