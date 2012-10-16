@@ -27,11 +27,12 @@ public class MainActivity extends Activity {
 		b1.setOnClickListener(mStartListener);
 		b2 = (Button) findViewById(R.id.stop);
 		b2.setOnClickListener(mStopListener);
-		tls = new TLSUpdater(getBaseContext(), "test.db", 21, 46);
-		tls.exportSchema();
-//		tls.run();
-		tls2 = new TLSUpdater(getBaseContext(), "test.db", 21, 46);
-		tls2.exportSchema();
+		tls = new TLSUpdater(getBaseContext(), "test.db", 19, 10);
+//		tls.exportSchema();
+		tls.run();
+		tls2 = new TLSUpdater(getBaseContext(), "test2.db", 19, 10);
+		tls2.run();
+//		tls2.exportSchema();
 	}
 
 	@Override
@@ -42,13 +43,14 @@ public class MainActivity extends Activity {
 
 	private OnClickListener mStartListener = new OnClickListener() {
 		public void onClick(View v) {
-			tls.run();
+//			tls.run();
 		}
 	};
 
 	private OnClickListener mStopListener = new OnClickListener() {
 		public void onClick(View v) {
 			tls.stop();
+			tls2.stop();
 		}
 	};
 

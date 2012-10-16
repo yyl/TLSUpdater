@@ -44,14 +44,15 @@ public class TLSUpdater {
 		updateTime.setTimeZone(TimeZone.getDefault());
 		updateTime.set(Calendar.HOUR_OF_DAY, this.hour);
 		updateTime.set(Calendar.MINUTE, this.minute);
-		// updateTime.add(Calendar.SECOND, START_DELAY);
 		Log.i(DEBUG_TAG, "Set the alarm to the time: " + updateTime.getTime());
 
+		int alarm_id = (int) System.currentTimeMillis();
 		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
 		alarm_intent.putExtra("dbName", dbname);
 		alarm_intent.putExtra("hour", this.hour);
 		alarm_intent.putExtra("minute", this.minute);
-		upload = PendingIntent.getBroadcast(context, 0, alarm_intent,
+		alarm_intent.putExtra("alarmId", alarm_id);
+		upload = PendingIntent.getBroadcast(context, alarm_id, alarm_intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmm.setRepeating(AlarmManager.RTC_WAKEUP,
 				updateTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, upload);
@@ -65,8 +66,6 @@ public class TLSUpdater {
 	public void stop() {
 		Log.i(DEBUG_TAG, "Stop the alarm");
 		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
-		upload = PendingIntent.getBroadcast(context, 0, alarm_intent,
-				PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmm.cancel(upload);
 	}

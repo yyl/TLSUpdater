@@ -86,10 +86,12 @@ public class UpdateIntent extends IntentService {
 		alarm_intent = new Intent(getBaseContext(), TLSAlarmReceiver.class);
 		int hour = intent.getIntExtra("hour", 18);
 		int minute = intent.getIntExtra("minute", 0);
+		int alarm_id = intent.getIntExtra("alarmId", 0);
 		alarm_intent.putExtra("dbName", db_name);
 		alarm_intent.putExtra("hour", hour);
 		alarm_intent.putExtra("minute", minute);
-		upload = PendingIntent.getBroadcast(getBaseContext(), 0, alarm_intent,
+		alarm_intent.putExtra("alarmId", alarm_id);
+		upload = PendingIntent.getBroadcast(getBaseContext(), alarm_id, alarm_intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		// get a Calendar object with current time
 		Calendar updateTime = Calendar.getInstance();
@@ -100,7 +102,6 @@ public class UpdateIntent extends IntentService {
 		if (hour >= 23) {
 			Log.i(DEBUG_TAG,
 					"Stop the alarm due to consecutively fail to upload the data. " + hour);
-//			alarmm.cancel(upload);
 
 			updateTime.add(Calendar.HOUR_OF_DAY, spref.getInt("hour", 0) + 1);
 			updateTime.set(Calendar.MINUTE, spref.getInt("minute", 0));
