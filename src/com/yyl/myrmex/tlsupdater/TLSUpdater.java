@@ -45,7 +45,7 @@ public class TLSUpdater {
 		updateTime.set(Calendar.HOUR_OF_DAY, this.hour);
 		updateTime.set(Calendar.MINUTE, this.minute);
 		Log.i(DEBUG_TAG, "Set the alarm to the time: " + updateTime.getTime());
-
+		ut.writeToFile("log.txt", "Set the alarm to the time: " + updateTime.getTime() + "\n");
 		int alarm_id = (int) System.currentTimeMillis();
 		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
 		alarm_intent.putExtra("dbName", dbname);

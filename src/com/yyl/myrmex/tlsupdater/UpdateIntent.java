@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -52,26 +53,29 @@ public class UpdateIntent extends IntentService {
 		Log.i(DEBUG_TAG, "Receiving an intent, update service starts...");
 		db_name = intent.getStringExtra("dbName");
 		String db_path = context.getDatabasePath(db_name).getAbsolutePath();
-		
-		db = SQLiteDatabase.openDatabase(db_path, null,
-				SQLiteDatabase.OPEN_READONLY);
 
-		dstreamer = new DataStreamer(db, db_name, context);
-		if (dstreamer.moveToFirst()) {
-			boolean success = true;
-			do {
-				if (!hasConnectivity() || !success) {
-					dstreamer.close();
-					reschedule(intent);
-					break;
-				}
-				success = dstreamer.sendPkt();
-			} while (dstreamer.moveToNext());
+		if (!doesDbExist(db_path)) {
+			Log.i(DEBUG_TAG, "DB has been created yet. Gonna skip it this time");
+		} else {
+			db = SQLiteDatabase.openDatabase(db_path, null,
+					SQLiteDatabase.OPEN_READONLY);
+
+			dstreamer = new DataStreamer(db, db_name, context);
+			if (dstreamer.moveToFirst()) {
+				boolean success = true;
+				do {
+					if (!hasConnectivity() || !success) {
+						dstreamer.close();
+						reschedule(intent);
+						break;
+					}
+					success = dstreamer.sendPkt();
+				} while (dstreamer.moveToNext());
+			}
+			dstreamer.close();
+
+			db.close();
 		}
-		dstreamer.close();
-		
-		db.close();
-
 	}
 
 	@Override
@@ -91,8 +95,8 @@ public class UpdateIntent extends IntentService {
 		alarm_intent.putExtra("hour", hour);
 		alarm_intent.putExtra("minute", minute);
 		alarm_intent.putExtra("alarmId", alarm_id);
-		upload = PendingIntent.getBroadcast(getBaseContext(), alarm_id, alarm_intent,
-				PendingIntent.FLAG_CANCEL_CURRENT);
+		upload = PendingIntent.getBroadcast(getBaseContext(), alarm_id,
+				alarm_intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		// get a Calendar object with current time
 		Calendar updateTime = Calendar.getInstance();
 		updateTime.setTimeZone(TimeZone.getDefault());
@@ -101,7 +105,8 @@ public class UpdateIntent extends IntentService {
 		// day
 		if (hour >= 23) {
 			Log.i(DEBUG_TAG,
-					"Stop the alarm due to consecutively fail to upload the data. " + hour);
+					"Stop the alarm due to consecutively fail to upload the data. "
+							+ hour);
 
 			updateTime.add(Calendar.HOUR_OF_DAY, spref.getInt("hour", 0) + 1);
 			updateTime.set(Calendar.MINUTE, spref.getInt("minute", 0));
@@ -125,6 +130,23 @@ public class UpdateIntent extends IntentService {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Check if the database exist
+	 * 
+	 * @return true if it exists, false if it doesn't
+	 */
+	private boolean doesDbExist(String path) {
+		SQLiteDatabase checkDB = null;
+		try {
+			checkDB = SQLiteDatabase.openDatabase(path, null,
+					SQLiteDatabase.OPEN_READONLY);
+			checkDB.close();
+		} catch (SQLiteException e) {
+			// database doesn't exist yet.
+		}
+		return checkDB != null ? true : false;
 	}
 
 }
