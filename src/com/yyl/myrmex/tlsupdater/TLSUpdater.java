@@ -1,5 +1,6 @@
 package com.yyl.myrmex.tlsupdater;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -45,7 +46,8 @@ public class TLSUpdater {
 		updateTime.set(Calendar.HOUR_OF_DAY, this.hour);
 		updateTime.set(Calendar.MINUTE, this.minute);
 		Log.i(DEBUG_TAG, "Set the alarm to the time: " + updateTime.getTime());
-		ut.writeToFile("log.txt", "Set the alarm to the time: " + updateTime.getTime() + "\n");
+		ut.writeToFile("log.txt",
+				"Set the alarm to the time: " + updateTime.getTime() + "\n");
 		int alarm_id = (int) System.currentTimeMillis();
 		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
 		alarm_intent.putExtra("dbName", dbname);
@@ -72,17 +74,26 @@ public class TLSUpdater {
 
 	public void exportSchema() {
 		String db_path = context.getDatabasePath(this.dbname).getAbsolutePath();
-		SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path, null,
-				SQLiteDatabase.OPEN_READONLY);
-		Cursor c = db.rawQuery(SQL_DUMP_SCHEMA, new String[0]);
-		if (c.moveToFirst()) {
-			do {
-				String create = c.getString(c.getColumnIndex("sql"));
-				String filename = this.dbname.replace(".db", "");
-				ut.writeToFile(filename, create+";");
-				Log.d(DEBUG_TAG, "export schema to " + filename + ": " + create);
-			} while (c.moveToNext());
+		String filename = this.dbname.replace(".db", "");
+		File fdb = new File(db_path);
+		if (!fdb.exists()) {
+			Log.i(DEBUG_TAG, "No such db exist yet.");
+			ut.writeToFile(filename, "No such db exist yet.");
+		} else {
+			SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path, null,
+					SQLiteDatabase.OPEN_READONLY);
+			Cursor c = db.rawQuery(SQL_DUMP_SCHEMA, new String[0]);
+			if (c.moveToFirst()) {
+				do {
+					String create = c.getString(c.getColumnIndex("sql"));
+					ut.writeToFile(filename, create + ";");
+					Log.d(DEBUG_TAG, "export schema to " + filename + ": "
+							+ create);
+				} while (c.moveToNext());
+			}
+			c.close();
+			db.close();
 		}
-		c.close();
+
 	}
 }

@@ -19,19 +19,19 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-//		TestDatabaseHelper database = new TestDatabaseHelper(getBaseContext());
-//		database.getWritableDatabase();
+		TestDatabaseHelper database = new TestDatabaseHelper(getBaseContext());
+		database.getWritableDatabase();
 //		TestDatabase2Helper database2 = new TestDatabase2Helper(getBaseContext());
 //		database2.getWritableDatabase();
 		b1 = (Button) findViewById(R.id.start);
 		b1.setOnClickListener(mStartListener);
 		b2 = (Button) findViewById(R.id.stop);
 		b2.setOnClickListener(mStopListener);
-		tls = new TLSUpdater(getBaseContext(), "test.db", 14, 45);
+		tls = new TLSUpdater(getBaseContext(), "test.db", 17, 37);
 //		tls.exportSchema();
 		tls.run();
-		tls2 = new TLSUpdater(getBaseContext(), "test2.db", 14, 45);
-		tls2.run();
+//		tls2 = new TLSUpdater(getBaseContext(), "test2.db", 14, 45);
+//		tls2.run();
 //		tls2.exportSchema();
 	}
 
@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
 	private OnClickListener mStopListener = new OnClickListener() {
 		public void onClick(View v) {
 			tls.stop();
-			tls2.stop();
+//			tls2.stop();
 		}
 	};
 

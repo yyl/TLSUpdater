@@ -72,7 +72,7 @@ public class UpdateIntent extends IntentService {
 						reschedule(intent);
 						break;
 					}
-					// success = dstreamer.sendPkt();
+					 success = dstreamer.sendPkt();
 				} while (dstreamer.moveToNext());
 			}
 			dstreamer.close();
