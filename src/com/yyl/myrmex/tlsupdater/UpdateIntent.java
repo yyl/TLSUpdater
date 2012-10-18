@@ -1,5 +1,6 @@
 package com.yyl.myrmex.tlsupdater;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -53,9 +54,11 @@ public class UpdateIntent extends IntentService {
 		Log.i(DEBUG_TAG, "Receiving an intent, update service starts...");
 		db_name = intent.getStringExtra("dbName");
 		String db_path = context.getDatabasePath(db_name).getAbsolutePath();
+		File fdb = new File(db_path);
 
-		if (!doesDbExist(db_path)) {
-			Log.i(DEBUG_TAG, "DB has been created yet. Gonna skip it this time");
+		// first check if the db has been created or not
+		if (!fdb.exists()) {
+			Log.i(DEBUG_TAG, "DB has been created yet. Gonna skip the uploading this time");
 		} else {
 			db = SQLiteDatabase.openDatabase(db_path, null,
 					SQLiteDatabase.OPEN_READONLY);
@@ -69,11 +72,10 @@ public class UpdateIntent extends IntentService {
 						reschedule(intent);
 						break;
 					}
-					success = dstreamer.sendPkt();
+					// success = dstreamer.sendPkt();
 				} while (dstreamer.moveToNext());
 			}
 			dstreamer.close();
-
 			db.close();
 		}
 	}
@@ -131,22 +133,4 @@ public class UpdateIntent extends IntentService {
 		}
 		return false;
 	}
-
-	/**
-	 * Check if the database exist
-	 * 
-	 * @return true if it exists, false if it doesn't
-	 */
-	private boolean doesDbExist(String path) {
-		SQLiteDatabase checkDB = null;
-		try {
-			checkDB = SQLiteDatabase.openDatabase(path, null,
-					SQLiteDatabase.OPEN_READONLY);
-			checkDB.close();
-		} catch (SQLiteException e) {
-			// database doesn't exist yet.
-		}
-		return checkDB != null ? true : false;
-	}
-
 }
