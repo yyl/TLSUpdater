@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -26,6 +25,7 @@ public class UpdateIntent extends IntentService {
 	private DataStreamer dstreamer;
 	private String db_name;
 	private SharedPreferences spref;
+	private Utilities ut;
 
 	private static final String DEBUG_TAG = "IntentService: UpdateIntent";
 
@@ -42,6 +42,7 @@ public class UpdateIntent extends IntentService {
 		super.onCreate();
 		context = getBaseContext();
 		spref = getSharedPreferences(TLSUpdater.TLS_PREF, 0);
+		this.ut = new Utilities();
 	}
 
 	/**
@@ -52,13 +53,18 @@ public class UpdateIntent extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Log.i(DEBUG_TAG, "Receiving an intent, update service starts...");
+		ut.writeToFile("log.txt",
+				"Receiving an intent, update service starts...\n");
 		db_name = intent.getStringExtra("dbName");
 		String db_path = context.getDatabasePath(db_name).getAbsolutePath();
 		File fdb = new File(db_path);
 
 		// first check if the db has been created or not
 		if (!fdb.exists()) {
-			Log.i(DEBUG_TAG, "DB has been created yet. Gonna skip the uploading this time");
+			Log.i(DEBUG_TAG,
+					"DB has been created yet. Gonna skip the uploading this time");
+			ut.writeToFile("log.txt",
+					"DB has been created yet. Gonna skip the uploading this time.\n");
 		} else {
 			db = SQLiteDatabase.openDatabase(db_path, null,
 					SQLiteDatabase.OPEN_READONLY);
@@ -72,7 +78,7 @@ public class UpdateIntent extends IntentService {
 						reschedule(intent);
 						break;
 					}
-					 success = dstreamer.sendPkt();
+					success = dstreamer.sendPkt();
 				} while (dstreamer.moveToNext());
 			}
 			dstreamer.close();
@@ -105,20 +111,24 @@ public class UpdateIntent extends IntentService {
 
 		// reschedule: delay 1 hour or set back to default if it is another
 		// day
-		if (hour >= 23) {
+		if (hour == 0) {
 			Log.i(DEBUG_TAG,
 					"Stop the alarm due to consecutively fail to upload the data. "
 							+ hour);
 
-			updateTime.add(Calendar.HOUR_OF_DAY, spref.getInt("hour", 0) + 1);
+			updateTime.add(Calendar.HOUR_OF_DAY, spref.getInt("hour", 0));
 			updateTime.set(Calendar.MINUTE, spref.getInt("minute", 0));
 			Log.i(DEBUG_TAG,
 					"Reset to the initial alarm time: " + updateTime.getTime());
+			ut.writeToFile("log.txt", "Reset to the initial alarm time: "
+					+ updateTime.getTime() + "\n");
 		} else {
 			updateTime.add(Calendar.HOUR_OF_DAY, 1);
 			updateTime.set(Calendar.MINUTE, minute);
 			Log.i(DEBUG_TAG,
 					"Reset the alarm to the time: " + updateTime.getTime());
+			ut.writeToFile("log.txt", "Reset the alarm to the time: "
+					+ updateTime.getTime() + "\n");
 		}
 		alarmm.setRepeating(AlarmManager.RTC_WAKEUP,
 				updateTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, upload);

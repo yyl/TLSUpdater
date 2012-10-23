@@ -8,10 +8,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Scanner;
+import java.util.TimeZone;
 
 import android.os.Environment;
 import android.util.Log;
@@ -54,7 +55,7 @@ public class Utilities {
 			Log.i(DEBUG_TAG, "Writing " + line + " to the file");
 			BufferedWriter buf = new BufferedWriter(new FileWriter(dateFile,
 					true));
-			buf.append(line);
+			buf.append("[" + currentTime() + "]:" + line);
 			buf.newLine();
 			buf.close();
 			Log.i(DEBUG_TAG, "Writing complete");
@@ -140,4 +141,12 @@ public class Utilities {
 		Log.i(DEBUG_TAG, "Deleting complete.");
 	}
 
+	public String currentTime() {
+		Calendar calendar = Calendar.getInstance();
+		String format = "yyyyMMdd";
+		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
+		sdf.setTimeZone(TimeZone.getDefault());
+		String gmtTime = sdf.format(calendar.getTimeInMillis());
+		return gmtTime;
+	}
 }
