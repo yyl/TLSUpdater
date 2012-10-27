@@ -24,7 +24,7 @@ public class TLSAlarmReceiver extends BroadcastReceiver {
 		i.putExtra("dbName", dbname);
 		i.putExtra("hour", hour);
 		i.putExtra("minute", minute);
-		ut.writeToFile("log.txt", "Receiving the alarm at " + hour + ":" + minute + "\n");
+		ut.writeToFile("log.txt", "TLSAlarmReceiver.onReceive(): Receiving the alarm at " + hour + ":" + minute);
 		context.startService(i);
 	}
 

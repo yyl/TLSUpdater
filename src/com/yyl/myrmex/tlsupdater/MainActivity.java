@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
 		b1.setOnClickListener(mStartListener);
 		b2 = (Button) findViewById(R.id.stop);
 		b2.setOnClickListener(mStopListener);
-		tls = new TLSUpdater(getBaseContext(), "test.db", 12, 37);
+		tls = new TLSUpdater(getBaseContext(), "test.db", 10, 34);
 //		tls.exportSchema();
 		tls.run();
 //		tls2 = new TLSUpdater(getBaseContext(), "test2.db", 14, 45);

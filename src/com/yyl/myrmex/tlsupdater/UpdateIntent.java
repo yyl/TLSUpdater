@@ -54,7 +54,7 @@ public class UpdateIntent extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		Log.i(DEBUG_TAG, "Receiving an intent, update service starts...");
 		ut.writeToFile("log.txt",
-				"Receiving an intent, update service starts...\n");
+				"UpdateIntent.onHandleIntent(): Receiving an intent to trigger the alarm...");
 		db_name = intent.getStringExtra("dbName");
 		String db_path = context.getDatabasePath(db_name).getAbsolutePath();
 		File fdb = new File(db_path);
@@ -64,7 +64,7 @@ public class UpdateIntent extends IntentService {
 			Log.i(DEBUG_TAG,
 					"DB has been created yet. Gonna skip the uploading this time");
 			ut.writeToFile("log.txt",
-					"DB has been created yet. Gonna skip the uploading this time.\n");
+					"UpdateIntent.onHandleIntent(): DB has not been created yet. Gonna skip the uploading this time.");
 		} else {
 			db = SQLiteDatabase.openDatabase(db_path, null,
 					SQLiteDatabase.OPEN_READONLY);
@@ -89,11 +89,14 @@ public class UpdateIntent extends IntentService {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.i(DEBUG_TAG, "Upload service finished.");
+		Log.i(DEBUG_TAG, "UpdateIntent.onHandleIntent(): Upload service finished.");
+		ut.writeToFile("log.txt", "UpdateIntent.onHandleIntent(): Upload service finished.\n" +
+				"=============================================\n");
 	}
 
 	private void reschedule(Intent intent) {
 		Log.i(DEBUG_TAG, "No connectivity available or uploading failed.");
+		ut.writeToFile("log.txt", "UpdateIntent.reschedule(): no connectivity detected. Plan to reschedule");
 		alarmm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		alarm_intent = new Intent(getBaseContext(), TLSAlarmReceiver.class);
 		int hour = intent.getIntExtra("hour", 18);
@@ -120,14 +123,14 @@ public class UpdateIntent extends IntentService {
 			updateTime.set(Calendar.MINUTE, spref.getInt("minute", 0));
 			Log.i(DEBUG_TAG,
 					"Reset to the initial alarm time: " + updateTime.getTime());
-			ut.writeToFile("log.txt", "Reset to the initial alarm time: "
+			ut.writeToFile("log.txt", "UpdateIntent.reschedule(): Reset to the initial alarm time: "
 					+ updateTime.getTime() + "\n");
 		} else {
 			updateTime.add(Calendar.HOUR_OF_DAY, 1);
 			updateTime.set(Calendar.MINUTE, minute);
 			Log.i(DEBUG_TAG,
 					"Reset the alarm to the time: " + updateTime.getTime());
-			ut.writeToFile("log.txt", "Reset the alarm to the time: "
+			ut.writeToFile("log.txt", "UpdateIntent.reschedule(): Reset the alarm to the time: "
 					+ updateTime.getTime() + "\n");
 		}
 		alarmm.setRepeating(AlarmManager.RTC_WAKEUP,

@@ -47,7 +47,7 @@ public class TLSUpdater {
 		updateTime.set(Calendar.MINUTE, this.minute);
 		Log.i(DEBUG_TAG, "Set the alarm to the time: " + updateTime.getTime());
 		ut.writeToFile("log.txt",
-				"Set the alarm to the time: " + updateTime.getTime() + "\n");
+				"TLSUpdater.run(): Set the alarm to the time: " + updateTime.getTime());
 		int alarm_id = (int) System.currentTimeMillis();
 		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
 		alarm_intent.putExtra("dbName", dbname);
@@ -78,7 +78,7 @@ public class TLSUpdater {
 		File fdb = new File(db_path);
 		if (!fdb.exists()) {
 			Log.i(DEBUG_TAG, "No such db exist yet.");
-			ut.writeToFile(filename, "No such db exist yet.");
+			ut.writeToFile(filename, "TLSUpdater.exportSchema(): No such db exist yet.");
 		} else {
 			SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path, null,
 					SQLiteDatabase.OPEN_READONLY);

@@ -56,6 +56,7 @@ public class Utilities {
 			BufferedWriter buf = new BufferedWriter(new FileWriter(dateFile,
 					true));
 			buf.append("[" + currentTime() + "]:" + line);
+//			buf.append(line);
 			buf.newLine();
 			buf.close();
 			Log.i(DEBUG_TAG, "Writing complete");
@@ -143,7 +144,7 @@ public class Utilities {
 
 	public String currentTime() {
 		Calendar calendar = Calendar.getInstance();
-		String format = "yyyyMMdd";
+		String format = "yyyyMMdd-hh:mm:ss";
 		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
 		sdf.setTimeZone(TimeZone.getDefault());
 		String gmtTime = sdf.format(calendar.getTimeInMillis());
