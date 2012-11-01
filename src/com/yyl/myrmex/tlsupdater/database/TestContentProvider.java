@@ -161,8 +161,8 @@ public class TestContentProvider extends ContentProvider {
 	}
 
 	private void checkColumns(String[] projection) {
-		String[] available = { TestTable.COLUMN_TIME, TestTable.COLUMN_VALUES,
-				TestTable.COLUMN_TIME, TestTable.COLUMN_ID };
+		String[] available = { TestTable.COLUMN_VALUES, TestTable.COLUMN_TIME,
+				TestTable.COLUMN_ID };
 		if (projection != null) {
 			HashSet<String> requestedColumns = new HashSet<String>(
 					Arrays.asList(projection));
