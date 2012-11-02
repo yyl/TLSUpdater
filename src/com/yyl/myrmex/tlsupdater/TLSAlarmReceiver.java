@@ -8,23 +8,26 @@ import android.util.Log;
 public class TLSAlarmReceiver extends BroadcastReceiver {
 
 	private static final String DEBUG_TAG = "AlarmReceiver";
-	private String dbname;
+	private String db_name;
+	private int hour, minute;
 	private Utilities ut;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		ut = new Utilities();
-		int hour = intent.getIntExtra("hour", 18);
-		int minute = intent.getIntExtra("minute", 0);
 		Log.i(DEBUG_TAG, "Invoke the repeating alarm...");
-		dbname = (String) intent.getCharSequenceExtra("dbName");
-		Log.i(DEBUG_TAG, "get the db name: " + dbname);
+		ut = new Utilities();
+		hour = intent.getIntExtra("hour", 18);
+		minute = intent.getIntExtra("minute", 0);
+		db_name = (String) intent.getCharSequenceExtra("dbName");
+		Log.i(DEBUG_TAG, "get the db name: " + db_name);
 		// constructing the intent for UpdateIntent
 		Intent i = new Intent(context, UpdateIntent.class);
-		i.putExtra("dbName", dbname);
+		i.putExtra("dbName", db_name);
 		i.putExtra("hour", hour);
 		i.putExtra("minute", minute);
-		ut.writeToFile("log.txt", "TLSAlarmReceiver.onReceive(): Receiving the alarm at " + hour + ":" + minute);
+		ut.writeToFile("log.txt",
+				"TLSAlarmReceiver.onReceive(): Receiving the alarm at " + hour
+						+ ":" + minute);
 		context.startService(i);
 	}
 

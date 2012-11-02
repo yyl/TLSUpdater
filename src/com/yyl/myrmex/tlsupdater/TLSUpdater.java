@@ -18,7 +18,7 @@ public class TLSUpdater {
 	private Intent alarm_intent;
 	private PendingIntent upload;
 	private AlarmManager alarmm;
-	private String dbname = "nodb";
+	private String db_name = "nodb";
 	private int hour, minute;
 	private SharedPreferences spreference;
 	private Utilities ut;
@@ -32,7 +32,7 @@ public class TLSUpdater {
 	public TLSUpdater(Context ctx, String dbname, int hour, int minute) {
 		context = ctx;
 		alarmm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		this.dbname = dbname;
+		this.db_name = dbname;
 		this.hour = hour;
 		this.minute = minute;
 		spreference = context.getSharedPreferences(TLS_PREF, 0);
@@ -48,20 +48,26 @@ public class TLSUpdater {
 		Log.i(DEBUG_TAG, "Set the alarm to the time: " + updateTime.getTime());
 		ut.writeToFile("log.txt",
 				"TLSUpdater.run(): Set the alarm to the time: " + updateTime.getTime());
+		// get an unique id for this alarm, this unique id should be stuck with it forever
 		int alarm_id = (int) System.currentTimeMillis();
+		// construct the intent
 		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
-		alarm_intent.putExtra("dbName", dbname);
+		alarm_intent.putExtra("dbName", db_name);
 		alarm_intent.putExtra("hour", this.hour);
 		alarm_intent.putExtra("minute", this.minute);
 		alarm_intent.putExtra("alarmId", alarm_id);
 		upload = PendingIntent.getBroadcast(context, alarm_id, alarm_intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
+		// set the alarm
 		alarmm.setRepeating(AlarmManager.RTC_WAKEUP,
 				updateTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, upload);
 
+		// save necessary information
 		SharedPreferences.Editor editor = spreference.edit();
+		editor.putString("dbName", this.db_name);
 		editor.putInt("hour", this.hour);
 		editor.putInt("minute", this.minute);
+		editor.putInt("alarmId", alarm_id);
 		editor.commit();
 	}
 
@@ -73,8 +79,8 @@ public class TLSUpdater {
 	}
 
 	public void exportSchema() {
-		String db_path = context.getDatabasePath(this.dbname).getAbsolutePath();
-		String filename = this.dbname.replace(".db", "");
+		String db_path = context.getDatabasePath(this.db_name).getAbsolutePath();
+		String filename = this.db_name.replace(".db", "");
 		File fdb = new File(db_path);
 		if (!fdb.exists()) {
 			Log.i(DEBUG_TAG, "No such db exist yet.");

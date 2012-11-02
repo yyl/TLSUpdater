@@ -37,9 +37,10 @@
         </provider>
 
         <receiver android:name=".TLSAlarmReceiver" >
+        </receiver>
+        <receiver android:name=".TLSRebootReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="com.yyl.myrmex.tlsupdater.UpdateIntent" />
             </intent-filter>
         </receiver>
 
