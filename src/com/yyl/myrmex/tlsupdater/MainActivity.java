@@ -46,7 +46,7 @@ public class MainActivity extends FragmentActivity implements
 		b1.setOnClickListener(mStartListener);
 		b2 = (Button) findViewById(R.id.stop);
 		b2.setOnClickListener(mStopListener);
-		tls = new TLSUpdater(getBaseContext(), "test.db", 14, 11);
+		tls = new TLSUpdater(getBaseContext(), "test.db", 23, 25);
 		tls.run();
 	}
 

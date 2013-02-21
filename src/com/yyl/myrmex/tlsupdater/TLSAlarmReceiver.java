@@ -14,7 +14,7 @@ public class TLSAlarmReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.i(DEBUG_TAG, "Invoke the repeating alarm...");
+		Log.i(DEBUG_TAG, "onReceive(): Receiving the alarm");
 		ut = new Utilities();
 		hour = intent.getIntExtra("hour", 18);
 		minute = intent.getIntExtra("minute", 0);
@@ -26,8 +26,7 @@ public class TLSAlarmReceiver extends BroadcastReceiver {
 		i.putExtra("hour", hour);
 		i.putExtra("minute", minute);
 		ut.writeToFile("log.txt",
-				"TLSAlarmReceiver.onReceive(): Receiving the alarm at " + hour
-						+ ":" + minute);
+				"TLSAlarmReceiver.onReceive(): Receiving the alarm");
 		context.startService(i);
 	}
 

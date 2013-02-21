@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import org.apache.http.client.ClientProtocolException;
+
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -27,7 +29,7 @@ public class UpdateIntent extends IntentService {
 	private SharedPreferences spref;
 	private Utilities ut;
 
-	private static final String DEBUG_TAG = "IntentService: UpdateIntent";
+	private static final String DEBUG_TAG = "UpdateIntent";
 
 	/**
 	 * A constructor is required, and must call the super IntentService(String)
@@ -52,24 +54,34 @@ public class UpdateIntent extends IntentService {
 	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Log.i(DEBUG_TAG, "Receiving an intent, update service starts...");
+		Log.i(DEBUG_TAG, "Update service starts...");
 		ut.writeToFile("log.txt",
-				"UpdateIntent.onHandleIntent(): Receiving an intent to trigger the alarm...");
+				"UpdateIntent.onHandleIntent(): Update service starts...");
 		db_name = intent.getStringExtra("dbName");
 		String db_path = context.getDatabasePath(db_name).getAbsolutePath();
+		Log.i(DEBUG_TAG, "Get the db: " + db_path);
+		ut.writeToFile("log.txt", "UpdateIntent.onHandleIntent(): Get the db: "
+				+ db_path);
 		File fdb = new File(db_path);
 
 		// first check if the db has been created or not
 		if (!fdb.exists()) {
 			Log.i(DEBUG_TAG,
-					"DB has been created yet. Gonna skip the uploading this time");
+					"DB has not been created yet. Gonna skip the uploading this time");
 			ut.writeToFile(
 					"log.txt",
 					"UpdateIntent.onHandleIntent(): DB has not been created yet. Gonna skip the uploading this time.");
 		} else {
-			db = SQLiteDatabase.openDatabase(db_path, null,
-					SQLiteDatabase.OPEN_READONLY);
-
+			try {
+				db = SQLiteDatabase.openDatabase(db_path, null,
+						SQLiteDatabase.OPEN_READONLY);
+			} catch (Exception e) {
+				e.printStackTrace();
+				ut.writeToFile("log.txt",
+						"UpdateIntent.onHandleIntent(): " + e.getMessage());
+			}
+			// db = SQLiteDatabase.openDatabase(db_path, null,
+			// SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 			dstreamer = new DataStreamer(db, db_name, context);
 			if (dstreamer.moveToFirst()) {
 				boolean success = true;
@@ -83,13 +95,20 @@ public class UpdateIntent extends IntentService {
 				} while (dstreamer.moveToNext());
 			}
 			dstreamer.close();
-			db.close();
+			if (db.isOpen()) {
+				db.close();
+			}
+
 		}
+
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		if (db.isOpen()) {
+			db.close();
+		}
 		Log.i(DEBUG_TAG,
 				"UpdateIntent.onHandleIntent(): Upload service finished.");
 		ut.writeToFile("log.txt",

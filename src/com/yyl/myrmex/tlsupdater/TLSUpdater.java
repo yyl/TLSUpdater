@@ -46,9 +46,12 @@ public class TLSUpdater {
 		updateTime.set(Calendar.HOUR_OF_DAY, this.hour);
 		updateTime.set(Calendar.MINUTE, this.minute);
 		Log.i(DEBUG_TAG, "Set the alarm to the time: " + updateTime.getTime());
-		ut.writeToFile("log.txt",
-				"TLSUpdater.run(): Set the alarm to the time: " + updateTime.getTime());
-		// get an unique id for this alarm, this unique id should be stuck with it forever
+		ut.writeToFile(
+				"log.txt",
+				"TLSUpdater.run(): Set the alarm to the time: "
+						+ updateTime.getTime());
+		// get an unique id for this alarm, this unique id should be stuck with
+		// it forever
 		int alarm_id = (int) System.currentTimeMillis();
 		// construct the intent
 		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
@@ -73,18 +76,21 @@ public class TLSUpdater {
 
 	public void stop() {
 		Log.i(DEBUG_TAG, "Stop the alarm");
+		ut.writeToFile("log.txt", "TLSUpdater.stop(): Stop the alarm.");
 		alarm_intent = new Intent(context, TLSAlarmReceiver.class);
 		alarmm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmm.cancel(upload);
 	}
 
 	public void exportSchema() {
-		String db_path = context.getDatabasePath(this.db_name).getAbsolutePath();
+		String db_path = context.getDatabasePath(this.db_name)
+				.getAbsolutePath();
 		String filename = this.db_name.replace(".db", "");
 		File fdb = new File(db_path);
 		if (!fdb.exists()) {
 			Log.i(DEBUG_TAG, "No such db exist yet.");
-			ut.writeToFile(filename, "TLSUpdater.exportSchema(): No such db exist yet.");
+			ut.writeToFile(filename,
+					"TLSUpdater.exportSchema(): No such db exist yet.");
 		} else {
 			SQLiteDatabase db = SQLiteDatabase.openDatabase(db_path, null,
 					SQLiteDatabase.OPEN_READONLY);
