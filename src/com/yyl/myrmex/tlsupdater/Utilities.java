@@ -55,8 +55,8 @@ public class Utilities {
 			Log.i(DEBUG_TAG, "Writing " + line + " to the file");
 			BufferedWriter buf = new BufferedWriter(new FileWriter(dateFile,
 					true));
-			buf.append("[" + currentTime() + "]:" + line);
-//			buf.append(line);
+//			buf.append("[" + currentTime() + "]:" + line);
+			buf.append(line);
 			buf.newLine();
 			buf.close();
 			Log.i(DEBUG_TAG, "Writing complete");

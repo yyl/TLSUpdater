@@ -74,7 +74,8 @@ public class UpdateIntent extends IntentService {
 		} else {
 			try {
 				db = SQLiteDatabase.openDatabase(db_path, null,
-						SQLiteDatabase.OPEN_READONLY);
+				// SQLiteDatabase.OPEN_READONLY);
+						SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 			} catch (Exception e) {
 				e.printStackTrace();
 				ut.writeToFile("log.txt",
@@ -106,9 +107,9 @@ public class UpdateIntent extends IntentService {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (db.isOpen()) {
-			db.close();
-		}
+		// if (db != null && db.isOpen()) {
+		// db.close();
+		// }
 		Log.i(DEBUG_TAG,
 				"UpdateIntent.onHandleIntent(): Upload service finished.");
 		ut.writeToFile("log.txt",
@@ -166,7 +167,10 @@ public class UpdateIntent extends IntentService {
 		ConnectivityManager cm = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo netInfo = cm.getActiveNetworkInfo();
-		if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+		// if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+		if (netInfo != null
+				&& netInfo.getType() == ConnectivityManager.TYPE_WIFI
+				&& netInfo.isConnected()) {
 			return true;
 		}
 		return false;
